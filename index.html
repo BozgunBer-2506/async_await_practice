@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async/Await & Fetch API Practice</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .card p {
+            color: #666;
+            font-size: 14px;
+        }
+        .card a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .card a:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Async/Await & Fetch API Practice</h1>
+        <p class="subtitle">11 Interactive Exercises - Learn Modern JavaScript</p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>1️⃣ Basic Fetch</h3>
+                <p>Learn HTTP GET requests and response handling</p>
+                <a href="/Teil1_basic_fetch/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>2️⃣ Promises & Chain</h3>
+                <p>Promise states and chaining</p>
+                <a href="/Teil2_promises_chain/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>3️⃣ Async/Await</h3>
+                <p>Modern async syntax</p>
+                <a href="/Teil3_async_await/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>4️⃣ JSON</h3>
+                <p>JSON parsing and stringify</p>
+                <a href="/Teil4_JSON/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>5️⃣ HTTP Methods</h3>
+                <p>CRUD operations with Fetch</p>
+                <a href="/Teil5_HTTP_fetch/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>6️⃣ Error Handling</h3>
+                <p>Proper error management</p>
+                <a href="/Teil6_error_handling/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>7️⃣ Loading States</h3>
+                <p>UX best practices</p>
+                <a href="/Teil7_Loading_Error_states/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>8️⃣ CORS</h3>
+                <p>Cross-origin requests</p>
+                <a href="/Teil8_CORS/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>9️⃣ Fetch + FastAPI</h3>
+                <p>Backend integration</p>
+                <a href="/Teil9_Fetch_FastAPI/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>🔟 User Directory</h3>
+                <p>Practice app with real data</p>
+                <a href="/Teil10_Praxis_User_Verzeichnis_App/index.html">Start →</a>
+            </div>
+            
+            <div class="card">
+                <h3>1️⃣1️⃣ Weather App</h3>
+                <p>Bonus: Real-time weather</p>
+                <a href="/Teil11_Bonus_Wetter_App/index.html">Start →</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
