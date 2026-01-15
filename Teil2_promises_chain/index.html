@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 2 - Promises</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .exercise {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+
+        .exercise h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        #output {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        .step {
+            padding: 8px 12px;
+            background: #e7f3ff;
+            border-left: 3px solid #667eea;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+
+        .step.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .step.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            color: #004085;
+            font-size: 14px;
+            border-left: 4px solid #667eea;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⛓️ Part 2 - Promises: Das Versprechen</h1>
+
+        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+            <strong>💡 Was sind Promises?</strong><br>
+            Ein Promise ist ein "Versprechen" auf einen zukünftigen Wert. Es hat 3 Zustände:
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li><code>PENDING</code> - Läuft noch</li>
+                <li><code>FULFILLED</code> - Erfolgreich! ✅</li>
+                <li><code>REJECTED</code> - Fehler! ❌</li>
+            </ul>
+        </div>
+
+        <div class="exercise">
+            <h2>📚 Demo 1: Promise States verstehen</h2>
+            <button class="btn" onclick="demo1()">Promise States Demo</button>
+            <div class="info">
+                Sieht wie sich ein Promise verhält - von PENDING zu FULFILLED
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>🔗 Demo 2: Promise Chain - Abhängige Requests</h2>
+            <button class="btn" onclick="demo2()">User → Posts laden</button>
+            <div class="info">
+                Zuerst User laden, dann dessen Posts. Jedes .then() gibt ein neues Promise zurück!
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>⚡ Demo 3: Promise Chain mit Fehlerbehandlung</h2>
+            <button class="btn" onclick="demo3()">Mit .catch()</button>
+            <button class="btn" onclick="demo3Invalid()">Mit Fehler simulieren</button>
+            <div class="info">
+                Ein .catch() am Ende der Chain fängt ALLE Fehler!
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>📊 Demo 4: Promise.all() - Parallele Requests</h2>
+            <button class="btn" onclick="demo4()">Parallel laden</button>
+            <div class="info">
+                Mehrere unabhängige Requests gleichzeitig starten (schneller!)
+            </div>
+        </div>
+
+        <h2 style="margin-top: 40px; margin-bottom: 20px;">📋 Ausgabe:</h2>
+        <div id="output">Klick auf einen Button um zu starten...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://jsonplaceholder.typicode.com';
+
+        function log(message, type = 'normal') {
+            const output = document.querySelector('#output');
+            const line = document.createElement('div');
+            
+            if (type === 'step') {
+                line.className = 'step';
+            } else if (type === 'success') {
+                line.className = 'step success';
+            } else if (type === 'error') {
+                line.className = 'step error';
+            }
+            
+            line.textContent = message;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.querySelector('#output').innerHTML = '';
+        }
+
+        // ========================================
+        // DEMO 1: Promise States
+        // ========================================
+        function demo1() {
+            clearOutput();
+            log('⏳ Demo 1: Promise States\n', 'normal');
+
+            // Zeige wie Promise funktion
+            log('1️⃣ Promise wird erstellt (PENDING)', 'step');
+            
+            const promise = fetch(`${API_BASE}/users/1`);
+            
+            log('2️⃣ Promise Status: ' + promise, 'step');
+            log('   (Intern: PENDING - läuft noch)\n', 'normal');
+
+            // Promise Chain
+            promise
+                .then(response => {
+                    log('3️⃣ Response erhalten! (FULFILLED)', 'success');
+                    log('   Status: ' + response.status, 'normal');
+                    return response.json();
+                })
+                .then(user => {
+                    log('4️⃣ JSON geparst (FULFILLED)', 'success');
+                    log('   Name: ' + user.name, 'normal');
+                    log('\n✅ Promise abgeschlossen!', 'success');
+                })
+                .catch(error => {
+                    log('❌ Fehler: ' + error.message, 'error');
+                });
+        }
+
+        // ========================================
+        // DEMO 2: Promise Chain
+        // ========================================
+        function demo2() {
+            clearOutput();
+            log('⛓️  Demo 2: Promise Chain\n', 'normal');
+            log('Ziel: User laden → Posts des Users laden\n', 'normal');
+
+            fetch(`${API_BASE}/users/2`)
+                .then(response => {
+                    log('✅ Schritt 1: User-Response erhalten', 'success');
+                    return response.json();
+                })
+                .then(user => {
+                    log('✅ Schritt 2: User geparst', 'success');
+                    log('   Name: ' + user.name, 'normal');
+                    log('   Lade nun Posts dieses Users...', 'normal');
+                    
+                    // Zweiter Request (abhängig vom ersten!)
+                    return fetch(`${API_BASE}/posts?userId=${user.id}`);
+                })
+                .then(response => {
+                    log('✅ Schritt 3: Posts-Response erhalten', 'success');
+                    return response.json();
+                })
+                .then(posts => {
+                    log('✅ Schritt 4: Posts geparst', 'success');
+                    log(`   ${posts.length} Posts gefunden:`, 'normal');
+                    
+                    posts.slice(0, 3).forEach((post, i) => {
+                        log(`   ${i+1}. ${post.title.substring(0, 50)}...`, 'normal');
+                    });
+                    
+                    log('\n✅ Chain abgeschlossen!', 'success');
+                })
+                .catch(error => {
+                    log('❌ Fehler in Chain: ' + error.message, 'error');
+                });
+        }
+
+        // ========================================
+        // DEMO 3: Error Handling mit .catch()
+        // ========================================
+        function demo3() {
+            clearOutput();
+            log('🛡️ Demo 3: Error Handling\n', 'normal');
+            log('(Erfolgreicher Request)\n', 'normal');
+
+            fetch(`${API_BASE}/users/1`)
+                .then(response => {
+                    log('✅ Schritt 1: Response erhalten', 'success');
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.json();
+                })
+                .then(user => {
+                    log('✅ Schritt 2: User geparst', 'success');
+                    log('   Name: ' + user.name, 'normal');
+                })
+                .catch(error => {
+                    log('❌ Fehler: ' + error.message, 'error');
+                });
+        }
+
+        function demo3Invalid() {
+            clearOutput();
+            log('🛡️ Demo 3: Error Handling\n', 'normal');
+            log('(Mit Fehler simuliert)\n', 'normal');
+
+            fetch(`${API_BASE}/users/99999`)
+                .then(response => {
+                    log('Schritt 1: Response erhalten', 'step');
+                    log('   Status: ' + response.status, 'normal');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status} - User nicht gefunden!`);
+                    }
+                    return response.json();
+                })
+                .then(user => {
+                    log('✅ Schritt 2: User geparst', 'success');
+                    log('   Name: ' + user.name, 'normal');
+                })
+                .catch(error => {
+                    log('❌ .catch() gefangen! (wie geplant)', 'error');
+                    log('   Fehler: ' + error.message, 'normal');
+                    log('\n💡 Das ist NORMAL und GEWOLLT!', 'normal');
+                    log('   .catch() am Ende fängt ALLE Fehler!', 'normal');
+                });
+        }
+
+        // ========================================
+        // DEMO 4: Promise.all() - Parallel
+        // ========================================
+        async function demo4() {
+            clearOutput();
+            log('⚡ Demo 4: Promise.all() - Parallele Requests\n', 'normal');
+
+            const startTime = Date.now();
+            log('⏳ Starte 3 Requests gleichzeitig...\n', 'step');
+
+            Promise.all([
+                fetch(`${API_BASE}/users`),
+                fetch(`${API_BASE}/posts`),
+                fetch(`${API_BASE}/comments`)
+            ])
+                .then(responses => {
+                    log('✅ Alle Responses erhalten!', 'success');
+                    log('   Parsing JSON...', 'normal');
+                    
+                    // Alle zu JSON parsen
+                    return Promise.all(
+                        responses.map(r => r.json())
+                    );
+                })
+                .then(([users, posts, comments]) => {
+                    const elapsed = Date.now() - startTime;
+                    
+                    log('✅ Alle Daten geparst!', 'success');
+                    log(`   Users: ${users.length}`, 'normal');
+                    log(`   Posts: ${posts.length}`, 'normal');
+                    log(`   Comments: ${comments.length}`, 'normal');
+                    log(`\n⏱️ Gesamt-Zeit: ${elapsed}ms`, 'normal');
+                    log('\n💡 Alle 3 Requests liefen PARALLEL!', 'normal');
+                })
+                .catch(error => {
+                    log('❌ Fehler: ' + error.message, 'error');
+                });
+        }
+
+        // Auto-Load beim Start
+        window.onload = () => {
+            clearOutput();
+            log('🚀 Part 2 - Promises bereit!\n', 'normal');
+            log('Lerne:', 'normal');
+            log('- Promise States (Pending, Fulfilled, Rejected)', 'normal');
+            log('- Promise Chains mit .then()', 'normal');
+            log('- Error Handling mit .catch()', 'normal');
+            log('- Parallele Requests mit Promise.all()', 'normal');
+            log('\nKlick auf einen Button oben um zu starten!', 'normal');
+        };
+    </script>
+</body>
+</html>

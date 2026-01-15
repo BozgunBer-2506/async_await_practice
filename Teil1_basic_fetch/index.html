@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1 - Basic Fetch</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 15px;
+        }
+
+        .exercise {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #007bff;
+            border-radius: 5px;
+        }
+
+        .exercise h2 {
+            color: #007bff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        #output {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .info {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            color: #004085;
+            font-size: 14px;
+            border-left: 4px solid #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Part 1 - Die Fetch API verstehen</h1>
+
+        <div class="exercise">
+            <h2>✅ Übung 1: Einfacher GET-Request (Alle User)</h2>
+            <button class="btn" onclick="exercise1()">User laden</button>
+            <div class="info">
+                Klick auf den Button um alle User von der API zu laden
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>✅ Übung 2: Einzelnen User abrufen</h2>
+            <button class="btn" onclick="exercise2()">User #1 laden</button>
+            <div class="info">
+                Laden Sie Details von einem einzelnen User
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>✅ Übung 3: Posts eines Users</h2>
+            <button class="btn" onclick="exercise3()">Posts von User #1 laden</button>
+            <div class="info">
+                Laden Sie alle Posts eines bestimmten Users
+            </div>
+        </div>
+
+        <h2 style="margin-top: 40px; margin-bottom: 20px;">📊 Ausgabe:</h2>
+        <div id="output">Klick auf einen Button um die Ausgabe zu sehen...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://jsonplaceholder.typicode.com';
+
+        // Hilfsfunktion zum Ausgeben
+        function log(message) {
+            const output = document.querySelector('#output');
+            output.textContent += message + '\n';
+        }
+
+        function clearOutput() {
+            document.querySelector('#output').textContent = '';
+        }
+
+        // ========================================
+        // ÜBUNG 1: Alle User laden
+        // ========================================
+        async function exercise1() {
+            clearOutput();
+            log('⏳ Lade User...\n');
+
+            try {
+                const response = await fetch(`${API_BASE}/users`);
+
+                log(`Status: ${response.status}`);
+                log(`OK?: ${response.ok}\n`);
+
+                const users = await response.json();
+
+                log(`✅ Erfolgreich geladen!\n`);
+                log(`Anzahl User: ${users.length}\n`);
+                log('Erste 3 User:');
+                log('-------------------');
+
+                users.slice(0, 3).forEach((user, index) => {
+                    log(`${index + 1}. ${user.name} (${user.email})`);
+                });
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`);
+            }
+        }
+
+        // ========================================
+        // ÜBUNG 2: Einzelnen User laden
+        // ========================================
+        async function exercise2() {
+            clearOutput();
+            log('⏳ Lade User #1...\n');
+
+            try {
+                const response = await fetch(`${API_BASE}/users/1`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const user = await response.json();
+
+                log('✅ User Details:\n');
+                log(`Name: ${user.name}`);
+                log(`Email: ${user.email}`);
+                log(`Telefon: ${user.phone}`);
+                log(`Website: ${user.website}`);
+                log(`\nAdresse:`);
+                log(`  Stadt: ${user.address.city}`);
+                log(`  Straße: ${user.address.street}`);
+                log(`\nFirma: ${user.company.name}`);
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`);
+            }
+        }
+
+        // ========================================
+        // ÜBUNG 3: Posts eines Users
+        // ========================================
+        async function exercise3() {
+            clearOutput();
+            log('⏳ Lade Posts von User #1...\n');
+
+            try {
+                const response = await fetch(`${API_BASE}/posts?userId=1`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const posts = await response.json();
+
+                log(`✅ ${posts.length} Posts gefunden!\n`);
+                log('Erste 5 Posts:');
+                log('-------------------\n');
+
+                posts.slice(0, 5).forEach((post, index) => {
+                    log(`${index + 1}. ${post.title}`);
+                    log(`   ID: ${post.id}\n`);
+                });
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`);
+            }
+        }
+
+        // Auto-Load beim Start
+        window.onload = () => {
+            log('🚀 Part 1 bereit!');
+            log('\nDiese Seite zeigt die Grundlagen von Fetch:');
+            log('- HTTP GET Requests');
+            log('- Response-Objekt');
+            log('- JSON parsen');
+            log('\nKlick auf einen Button oben um zu starten!');
+        };
+    </script>
+</body>
+</html>

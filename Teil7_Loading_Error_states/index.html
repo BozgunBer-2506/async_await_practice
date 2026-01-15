@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 7 - Loading States</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #content {
+            min-height: 300px;
+            padding: 20px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #f5c6cb;
+        }
+
+        .error button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #721c24;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .error button:hover {
+            background: #5a1419;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .user-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .user-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .user-card p {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .stats {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 5px;
+            color: #004085;
+            font-size: 14px;
+        }
+
+        .code-section {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .code-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .code {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+        }
+
+        .demo-box {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .demo-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .demo-box p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ Part 7 - Loading & Error States</h1>
+
+        <div class="demo-box">
+            <h4>💡 Drei Zustände für bessere UX:</h4>
+            <p>
+                <strong>1. Loading</strong> - Daten werden geladen (Spinner zeigen)<br>
+                <strong>2. Error</strong> - Fehler aufgetreten (Fehlermeldung zeigen)<br>
+                <strong>3. Success</strong> - Daten erfolgreich geladen (Daten anzeigen)
+            </p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="loadUsers()">✅ Erfolgreich laden</button>
+            <button class="btn" onclick="loadError()">❌ Fehler simulieren</button>
+            <button class="btn" onclick="clearContent()">🗑️ Leeren</button>
+        </div>
+
+        <div id="content">
+            <div class="empty">
+                <p>Klick auf einen Button um zu starten</p>
+            </div>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="code-section">
+            <h3>📝 State Management Muster:</h3>
+            <div class="code">
+let state = {
+  data: null,
+  isLoading: false,
+  error: null
+};
+
+async function loadData() {
+  state.isLoading = true;
+  state.error = null;
+  updateUI();  // Loading anzeigen
+
+  try {
+    const res = await fetch('/api/data');
+    state.data = await res.json();
+  } catch (error) {
+    state.error = error.message;
+  } finally {
+    state.isLoading = false;
+    updateUI();  // Success oder Error anzeigen
+  }
+}
+
+function updateUI() {
+  if (state.isLoading) {
+    // Spinner zeigen
+  } else if (state.error) {
+    // Error zeigen
+  } else {
+    // Daten zeigen
+  }
+}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://jsonplaceholder.typicode.com';
+
+        // ========================================
+        // STATE
+        // ========================================
+        let state = {
+            users: [],
+            isLoading: false,
+            error: null
+        };
+
+        // ========================================
+        // UI UPDATE
+        // ========================================
+        function updateUI() {
+            const content = document.querySelector('#content');
+            const stats = document.querySelector('#stats');
+            const btns = document.querySelectorAll('.btn');
+
+            // Alle Buttons deaktivieren während Loading
+            btns.forEach(btn => btn.disabled = state.isLoading);
+
+            // LOADING STATE
+            if (state.isLoading) {
+                content.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>⏳ Lädt Daten...</p>
+                    </div>
+                `;
+                stats.textContent = '⏳ Lädt...';
+                return;
+            }
+
+            // ERROR STATE
+            if (state.error) {
+                content.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Fehler!</h3>
+                        <p>${escapeHtml(state.error)}</p>
+                        <button onclick="loadUsers()">Erneut versuchen</button>
+                    </div>
+                `;
+                stats.textContent = '❌ Fehler aufgetreten';
+                return;
+            }
+
+            // EMPTY STATE
+            if (state.users.length === 0) {
+                content.innerHTML = `
+                    <div class="empty">
+                        <p>Keine Daten vorhanden</p>
+                    </div>
+                `;
+                stats.textContent = '0 Benutzer';
+                return;
+            }
+
+            // SUCCESS STATE
+            const usersHtml = state.users.map(user => `
+                <div class="user-card">
+                    <h3>${escapeHtml(user.name)}</h3>
+                    <p><strong>Email:</strong> ${escapeHtml(user.email)}</p>
+                    <p><strong>Stadt:</strong> ${escapeHtml(user.address.city)}</p>
+                    <p><strong>Firma:</strong> ${escapeHtml(user.company.name)}</p>
+                </div>
+            `).join('');
+
+            content.innerHTML = `<div class="user-grid">${usersHtml}</div>`;
+            stats.textContent = `✅ ${state.users.length} Benutzer geladen`;
+        }
+
+        // ========================================
+        // LOAD FUNCTIONS
+        // ========================================
+        async function loadUsers() {
+            // 1. LOADING START
+            state.isLoading = true;
+            state.error = null;
+            updateUI();
+
+            try {
+                // Künstliche Verzögerung für Demo
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                const response = await fetch(`${API_BASE}/users`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                // 2. SUCCESS
+                state.users = await response.json();
+                state.error = null;
+
+            } catch (error) {
+                // 3. ERROR
+                state.error = error.message;
+                state.users = [];
+
+            } finally {
+                // 4. ALWAYS
+                state.isLoading = false;
+                updateUI();
+            }
+        }
+
+        async function loadError() {
+            // 1. LOADING START
+            state.isLoading = true;
+            state.error = null;
+            updateUI();
+
+            try {
+                // Künstliche Verzögerung
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Ungültige URL für Error
+                const response = await fetch(`${API_BASE}/invalid-endpoint`);
+
+                if (!response.ok) {
+                    throw new Error(`Ressource nicht gefunden (${response.status})`);
+                }
+
+                state.users = await response.json();
+
+            } catch (error) {
+                // 3. ERROR
+                state.error = error.message;
+                state.users = [];
+
+            } finally {
+                // 4. ALWAYS
+                state.isLoading = false;
+                updateUI();
+            }
+        }
+
+        function clearContent() {
+            state = {
+                users: [],
+                isLoading: false,
+                error: null
+            };
+            updateUI();
+        }
+
+        // ========================================
+        // HELPERS
+        // ========================================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Init
+        window.onload = () => {
+            updateUI();
+        };
+    </script>
+</body>
+</html>

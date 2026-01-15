@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User-Verzeichnis App</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 8px;
+            font-size: 32px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        #content {
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #f5c6cb;
+        }
+
+        .error h3 {
+            margin-bottom: 10px;
+        }
+
+        .error button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #721c24;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .error button:hover {
+            background: #5a1419;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .user-card h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .user-info {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .user-info strong {
+            color: #667eea;
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-top: 8px;
+            margin-bottom: 2px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty p {
+            font-size: 16px;
+        }
+
+        .stats {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .tutorial {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            color: #004085;
+        }
+
+        .tutorial h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .tutorial ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 User-Verzeichnis</h1>
+            <p>Komplette Praxis-Übung mit Fetch, Async/Await & Error Handling</p>
+        </header>
+
+        <div class="controls">
+            <input 
+                type="text" 
+                id="search" 
+                class="search-input" 
+                placeholder="Suche nach Name oder Email..."
+            >
+            <button class="btn" id="loadBtn" onclick="loadUsers()">🔄 Neu laden</button>
+        </div>
+
+        <div id="content">
+            <div class="tutorial">
+                <h3>📖 Diese App zeigt:</h3>
+                <ol>
+                    <li>Fetch mit <span class="code">async/await</span></li>
+                    <li>Error Handling mit <span class="code">try/catch</span></li>
+                    <li>Loading & Error States</li>
+                    <li>Live-Suche mit Filter</li>
+                    <li>Sauberer JavaScript Code</li>
+                </ol>
+            </div>
+            <p style="text-align: center; color: #888;">
+                🚀 Klick "Neu laden" um zu starten!
+            </p>
+        </div>
+
+        <div class="stats" id="stats"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://jsonplaceholder.typicode.com';
+
+        // ========================================
+        // STATE
+        // ========================================
+        let state = {
+            users: [],
+            filteredUsers: [],
+            isLoading: false,
+            error: null,
+            searchQuery: ''
+        };
+
+        // ========================================
+        // API FUNCTIONS
+        // ========================================
+
+        /**
+         * User von API laden
+         * @returns {Promise<Array>} Array von Users
+         */
+        async function fetchUsers() {
+            const response = await fetch(`${API_BASE}/users`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            return response.json();
+        }
+
+        // ========================================
+        // LOAD LOGIC
+        // ========================================
+
+        /**
+         * Users laden mit Loading States
+         */
+        async function loadUsers() {
+            // 1. LOADING START
+            state.isLoading = true;
+            state.error = null;
+            updateUI();
+
+            try {
+                state.users = await fetchUsers();
+                state.filteredUsers = state.users;
+                state.error = null;
+
+            } catch (error) {
+                state.error = error.message;
+                state.users = [];
+                state.filteredUsers = [];
+
+            } finally {
+                state.isLoading = false;
+                updateUI();
+            }
+        }
+
+        // ========================================
+        // FILTER LOGIC
+        // ========================================
+
+        /**
+         * Users nach Suchtext filtern
+         * @param {string} query - Suchtext
+         */
+        function filterUsers(query) {
+            state.searchQuery = query.toLowerCase();
+
+            if (!query.trim()) {
+                state.filteredUsers = state.users;
+            } else {
+                state.filteredUsers = state.users.filter(user =>
+                    user.name.toLowerCase().includes(state.searchQuery) ||
+                    user.email.toLowerCase().includes(state.searchQuery)
+                );
+            }
+
+            updateUI();
+        }
+
+        // ========================================
+        // UI UPDATE
+        // ========================================
+
+        /**
+         * UI basierend auf State aktualisieren
+         */
+        function updateUI() {
+            const content = document.querySelector('#content');
+            const stats = document.querySelector('#stats');
+            const loadBtn = document.querySelector('#loadBtn');
+
+            // Button State
+            loadBtn.disabled = state.isLoading;
+
+            // LOADING STATE
+            if (state.isLoading) {
+                content.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>⏳ Lädt User...</p>
+                    </div>
+                `;
+                stats.textContent = '⏳ Lädt...';
+                return;
+            }
+
+            // ERROR STATE
+            if (state.error) {
+                content.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Fehler beim Laden!</h3>
+                        <p>${escapeHtml(state.error)}</p>
+                        <button onclick="loadUsers()">Erneut versuchen</button>
+                    </div>
+                `;
+                stats.textContent = '❌ Fehler aufgetreten';
+                return;
+            }
+
+            // EMPTY STATE
+            if (state.filteredUsers.length === 0) {
+                content.innerHTML = `
+                    <div class="empty">
+                        <p>📭 Keine User gefunden</p>
+                        ${state.searchQuery ? '<p style="font-size: 13px; margin-top: 10px;">Versuche einen anderen Suchbegriff</p>' : ''}
+                    </div>
+                `;
+                stats.textContent = `0 von ${state.users.length} Usern`;
+                return;
+            }
+
+            // SUCCESS STATE
+            const usersHtml = state.filteredUsers.map(user => `
+                <div class="user-card">
+                    <h3>${escapeHtml(user.name)}</h3>
+                    <div class="user-info">
+                        <strong>Email</strong>
+                        ${escapeHtml(user.email)}
+
+                        <strong>Telefon</strong>
+                        ${escapeHtml(user.phone)}
+
+                        <strong>Website</strong>
+                        ${escapeHtml(user.website)}
+
+                        <strong>Stadt</strong>
+                        ${escapeHtml(user.address.city)}
+
+                        <strong>Firma</strong>
+                        ${escapeHtml(user.company.name)}
+                    </div>
+                </div>
+            `).join('');
+
+            content.innerHTML = `<div class="user-grid">${usersHtml}</div>`;
+            stats.textContent = `✅ ${state.filteredUsers.length} von ${state.users.length} Usern angezeigt`;
+        }
+
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+
+        /**
+         * HTML-Sonderzeichen escapen (XSS-Schutz)
+         * @param {string} text - Text zum escapen
+         * @returns {string} Escapeter Text
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ========================================
+        // EVENT LISTENERS
+        // ========================================
+
+        document.querySelector('#search').addEventListener('input', (e) => {
+            filterUsers(e.target.value);
+        });
+
+        // ========================================
+        // INIT
+        // ========================================
+
+        window.onload = () => {
+            updateUI();
+        };
+    </script>
+</body>
+</html>
