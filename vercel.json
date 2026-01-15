@@ -1,0 +1,48 @@
+{
+  "rewrites": [
+    {
+      "source": "/Teil1_basic_fetch",
+      "destination": "/Teil1_basic_fetch/index.html"
+    },
+    {
+      "source": "/Teil2_promises_chain",
+      "destination": "/Teil2_promises_chain/index.html"
+    },
+    {
+      "source": "/Teil3_async_await",
+      "destination": "/Teil3_async_await/index.html"
+    },
+    {
+      "source": "/Teil4_JSON",
+      "destination": "/Teil4_JSON/index.html"
+    },
+    {
+      "source": "/Teil5_HTTP_fetch",
+      "destination": "/Teil5_HTTP_fetch/index.html"
+    },
+    {
+      "source": "/Teil6_error_handling",
+      "destination": "/Teil6_error_handling/index.html"
+    },
+    {
+      "source": "/Teil7_Loading_Error_states",
+      "destination": "/Teil7_Loading_Error_states/index.html"
+    },
+    {
+      "source": "/Teil8_CORS",
+      "destination": "/Teil8_CORS/index.html"
+    },
+    {
+      "source": "/Teil9_Fetch_FastAPI",
+      "destination": "/Teil9_Fetch_FastAPI/index.html"
+    },
+    {
+      "source": "/Teil10_Praxis_User_Verzeichnis_App",
+      "destination": "/Teil10_Praxis_User_Verzeichnis_App/index.html"
+    },
+    {
+      "source": "/Teil11_Bonus_Wetter_App",
+      "destination": "/Teil11_Bonus_Wetter_App/index.html"
+    }
+  ]
+}
