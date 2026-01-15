@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 8 - CORS</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #fa709a;
+            padding-bottom: 15px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .exercise {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #fa709a;
+            border-radius: 5px;
+        }
+
+        .exercise h2 {
+            color: #fa709a;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fa709a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #f85a7b;
+        }
+
+        #output {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .step {
+            padding: 8px 12px;
+            background: #e7f3ff;
+            border-left: 3px solid #fa709a;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+
+        .step.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .step.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .step.info {
+            background: #d1ecf1;
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .cors-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+
+        .cors-table th,
+        .cors-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cors-table th {
+            background: #fa709a;
+            color: white;
+            font-weight: bold;
+        }
+
+        .cors-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            border-left: 3px solid #fa709a;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        .solution {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 Part 8 - CORS verstehen</h1>
+
+        <div class="warning">
+            <strong>⚠️ CORS = Cross-Origin Resource Sharing</strong><br>
+            Der Browser blockiert fetch() zu anderen Domains aus Sicherheitsgründen!
+        </div>
+
+        <div class="exercise">
+            <h2>1️⃣ Was ist CORS?</h2>
+            <table class="cors-table">
+                <tr>
+                    <th>Deine Seite</th>
+                    <th>API-Server</th>
+                    <th>CORS Problem?</th>
+                </tr>
+                <tr>
+                    <td>localhost:3000</td>
+                    <td>localhost:3000</td>
+                    <td>❌ Nein (Same Origin)</td>
+                </tr>
+                <tr>
+                    <td>localhost:3000</td>
+                    <td>localhost:8000</td>
+                    <td>✅ JA (anderer Port!)</td>
+                </tr>
+                <tr>
+                    <td>meinsite.de</td>
+                    <td>api.meinsite.de</td>
+                    <td>✅ JA (andere Subdomain!)</td>
+                </tr>
+                <tr>
+                    <td>meinsite.de</td>
+                    <td>anderesite.de</td>
+                    <td>✅ JA (andere Domain!)</td>
+                </tr>
+            </table>
+            <div class="info-box">
+                <strong>💡 Origin = Protocol + Domain + Port</strong><br>
+                http://localhost:3000 ≠ http://localhost:8000<br>
+                https://api.com ≠ https://api2.com
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>2️⃣ CORS funktioniert - mit Allow-Origin Header</h2>
+            <button class="btn" onclick="demoCORSWorks()">JSONPlaceholder (CORS enabled)</button>
+            <div class="info-box">
+                Diese API hat CORS aktiviert - funktioniert problemlos!
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>3️⃣ CORS Error simulieren</h2>
+            <button class="btn" onclick="demoCORSError()">Fehler (ungültige Domain)</button>
+            <div class="info-box">
+                Das wird einen CORS-Fehler werfen
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>4️⃣ CORS L

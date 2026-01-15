@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 5 - HTTP Methods</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #43e97b;
+            padding-bottom: 15px;
+        }
+
+        .exercise {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #43e97b;
+            border-radius: 5px;
+        }
+
+        .exercise h2 {
+            color: #43e97b;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #43e97b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2ec853;
+        }
+
+        #output {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            line-height: 1.5;
+        }
+
+        .step {
+            padding: 8px 12px;
+            background: #e7f3ff;
+            border-left: 3px solid #43e97b;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .step.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .step.info {
+            background: #d1ecf1;
+            border-left-color: #43e97b;
+            color: #0c5460;
+        }
+
+        .info {
+            background: #d1f0e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            color: #0c5460;
+            font-size: 14px;
+            border-left: 4px solid #43e97b;
+        }
+
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .method-card {
+            padding: 15px;
+            border-radius: 5px;
+            background: #f5f5f5;
+            border-left: 4px solid #43e97b;
+        }
+
+        .method-card h4 {
+            color: #43e97b;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .method-card p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .code-example {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #43e97b;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .crud-demo {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            border: 2px solid #43e97b;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #43e97b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Part 5 - HTTP-Methoden mit Fetch</h1>
+
+        <div class="warning">
+            <strong>💡 HTTP-Methoden sind Befehle für den Server:</strong><br>
+            GET = Daten abrufen<br>
+            POST = Neue Daten erstellen<br>
+            PUT = Alles ersetzen<br>
+            PATCH = Teilweise ändern<br>
+            DELETE = Löschen
+        </div>
+
+        <div class="exercise">
+            <h2>📊 Die 5 wichtigsten HTTP-Methoden</h2>
+            <div class="methods-grid">
+                <div class="method-card">
+                    <h4>GET 📖</h4>
+                    <p><strong>Daten abrufen</strong><br>
+                    Safe & Idempotent<br>
+                    Kein Body</p>
+                </div>
+                <div class="method-card">
+                    <h4>POST ➕</h4>
+                    <p><strong>Neu erstellen</strong><br>
+                    Nicht Idempotent<br>
+                    Mit Body (Daten)</p>
+                </div>
+                <div class="method-card">
+                    <h4>PUT 🔄</h4>
+                    <p><strong>Alles ersetzen</strong><br>
+                    Idempotent<br>
+                    Mit Body (alle Felder)</p>
+                </div>
+                <div class="method-card">
+                    <h4>PATCH ✏️</h4>
+                    <p><strong>Teilweise ändern</strong><br>
+                    Idempotent<br>
+                    Mit Body (nur Änderungen)</p>
+                </div>
+                <div class="method-card">
+                    <h4>DELETE 🗑️</h4>
+                    <p><strong>Löschen</strong><br>
+                    Idempotent<br>
+                    Kein Body</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>1️⃣ GET - Daten abrufen</h2>
+            <button class="btn" onclick="demoGET()">GET Request</button>
+            <div class="info">
+                Hole Daten vom Server (Standard fetch)
+            </div>
+            <div class="code-example">
+const response = await fetch('/api/posts/1');
+const post = await response.json();
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>2️⃣ POST - Neue Daten erstellen</h2>
+            <button class="btn" onclick="demoPOST()">POST Request</button>
+            <div class="info">
+                Sende neue Daten zum Server
+            </div>
+            <div class="code-example">
+const response = await fetch('/api/posts', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: "...", body: "..." })
+});
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>3️⃣ PUT - Alles ersetzen</h2>
+            <button class="btn" onclick="demoPUT()">PUT Request</button>
+            <div class="info">
+                Ersetze eine komplette Ressource
+            </div>
+            <div class="code-example">
+const response = await fetch('/api/posts/1', {
+  method: 'PUT',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    id: 1,
+    title: "Neuer Title",
+    body: "Neuer Body"
+  })
+});
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>4️⃣ PATCH - Teilweise ändern</h2>
+            <button class="btn" onclick="demoPATCH()">PATCH Request</button>
+            <div class="info">
+                Ändere nur einzelne Felder
+            </div>
+            <div class="code-example">
+const response = await fetch('/api/posts/1', {
+  method: 'PATCH',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: "Nur Title ändern" })
+});
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>5️⃣ DELETE - Löschen</h2>
+            <button class="btn" onclick="demoDELETE()">DELETE Request</button>
+            <div class="info">
+                Lösche eine Ressource
+            </div>
+            <div class="code-example">
+const response = await fetch('/api/posts/1', {
+  method: 'DELETE'
+});
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>🔄 CRUD Demo - Alle zusammen</h2>
+            <button class="btn" onclick="demoCRUD()">CRUD Workflow</button>
+            <div class="info">
+                Führe alle 4 CRUD-Operationen nacheinander durch
+            </div>
+        </div>
+
+        <h2 style="margin-top: 40px; margin-bottom: 20px;">📋 Ausgabe:</h2>
+        <div id="output">Klick auf einen Button um zu starten...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://jsonplaceholder.typicode.com';
+
+        function log(message, type = 'normal') {
+            const output = document.querySelector('#output');
+            const line = document.createElement('div');
+            
+            if (type === 'step') {
+                line.className = 'step';
+            } else if (type === 'success') {
+                line.className = 'step success';
+            } else if (type === 'info') {
+                line.className = 'step info';
+            }
+            
+            line.textContent = message;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.querySelector('#output').innerHTML = '';
+        }
+
+        // ========================================
+        // GET
+        // ========================================
+        async function demoGET() {
+            clearOutput();
+            log('1️⃣ GET - Daten abrufen\n', 'normal');
+
+            try {
+                log('⏳ Fetch ohne method = GET (Standard)', 'step');
+                const response = await fetch(`${API_BASE}/posts/1`);
+                
+                log('✅ Response erhalten', 'success');
+                log(`   Status: ${response.status}`, 'info');
+
+                const post = await response.json();
+                log(`\n✅ Daten geparst:`, 'success');
+                log(`   ID: ${post.id}`, 'normal');
+                log(`   Title: ${post.title}`, 'normal');
+                log(`   Body: ${post.body.substring(0, 50)}...`, 'normal');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'normal');
+            }
+        }
+
+        // ========================================
+        // POST
+        // ========================================
+        async function demoPOST() {
+            clearOutput();
+            log('2️⃣ POST - Neue Daten erstellen\n', 'normal');
+
+            try {
+                const newPost = {
+                    title: "Mein neuer Post",
+                    body: "Das ist der Inhalt",
+                    userId: 1
+                };
+
+                log('⏳ Sende POST Request mit Daten:', 'step');
+                log(`   ${JSON.stringify(newPost)}`, 'normal');
+
+                const response = await fetch(`${API_BASE}/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newPost)
+                });
+
+                const createdPost = await response.json();
+                log(`\n✅ Post erstellt!`, 'success');
+                log(`   ID (Server-generiert): ${createdPost.id}`, 'normal');
+                log(`   Title: ${createdPost.title}`, 'normal');
+                log(`   Body: ${createdPost.body}`, 'normal');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'normal');
+            }
+        }
+
+        // ========================================
+        // PUT
+        // ========================================
+        async function demoPUT() {
+            clearOutput();
+            log('3️⃣ PUT - Alles ersetzen\n', 'normal');
+
+            try {
+                const updatedPost = {
+                    id: 1,
+                    title: "Komplett neuer Title",
+                    body: "Komplett neuer Body",
+                    userId: 1
+                };
+
+                log('⏳ Sende PUT Request (ALLES ersetzen):', 'step');
+                log(`   ${JSON.stringify(updatedPost)}`, 'normal');
+
+                const response = await fetch(`${API_BASE}/posts/1`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedPost)
+                });
+
+                const result = await response.json();
+                log(`\n✅ Post aktualisiert!`, 'success');
+                log(`   Title (geändert): ${result.title}`, 'normal');
+                log(`   Body (geändert): ${result.body}`, 'normal');
+                log(`\n💡 Mit PUT wird ALLES ersetzt!`, 'info');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'normal');
+            }
+        }
+
+        // ========================================
+        // PATCH
+        // ========================================
+        async function demoPATCH() {
+            clearOutput();
+            log('4️⃣ PATCH - Nur Felder ändern\n', 'normal');
+
+            try {
+                const partialUpdate = {
+                    title: "Nur Title geändert"
+                    // Body NICHT angegeben - wird nicht geändert
+                };
+
+                log('⏳ Sende PATCH Request (nur Title):', 'step');
+                log(`   ${JSON.stringify(partialUpdate)}`, 'normal');
+
+                const response = await fetch(`${API_BASE}/posts/1`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(partialUpdate)
+                });
+
+                const result = await response.json();
+                log(`\n✅ Post teilweise aktualisiert!`, 'success');
+                log(`   Title (geändert): ${result.title}`, 'normal');
+                log(`   Body (original): ${result.body.substring(0, 40)}...`, 'normal');
+                log(`\n💡 Mit PATCH ändern wir nur angegebene Felder!`, 'info');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'normal');
+            }
+        }
+
+        // ========================================
+        // DELETE
+        // ========================================
+        async function demoDELETE() {
+            clearOutput();
+            log('5️⃣ DELETE - Ressource löschen\n', 'normal');
+
+            try {
+                log('⏳ Sende DELETE Request für Post #1:', 'step');
+
+                const response = await fetch(`${API_BASE}/posts/1`, {
+                    method: 'DELETE'
+                });
+
+                log(`✅ Deleted!`, 'success');
+                log(`   Status: ${response.status}`, 'normal');
+                log(`   OK?: ${response.ok}`, 'normal');
+
+                log(`\n💡 Status 200 = erfolgreich gelöscht!`, 'info');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'normal');
+            }
+        }
+
+        // ========================================
+        // CRUD
+        // ========================================
+        async function demoCRUD() {
+            clearOutput();
+            log('🔄 CRUD Demo - CREATE, READ, UPDATE, DELETE\n', 'normal');
+
+            try {
+                // CREATE
+                log('1️⃣ CREATE - Neuen Post erstellen', 'step');
+                const newPost = { title: "CRUD Test", body: "Test Body", userId: 99 };
+                const createRes = await fetch(`${API_BASE}/posts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newPost)
+                });
+                const created = await createRes.json();
+                log(`   ✅ ID ${created.id} erstellt`, 'success');
+
+                // READ
+                log('\n2️⃣ READ - Post abrufen', 'step');
+                const readRes = await fetch(`${API_BASE}/posts/${created.id}`);
+                const read = await readRes.json();
+                log(`   ✅ Post gelesen: "${read.title}"`, 'success');
+
+                // UPDATE
+                log('\n3️⃣ UPDATE - Post ändern', 'step');
+                const updateRes = await fetch(`${API_BASE}/posts/${created.id}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: "Geänderter Titel" })
+                });
+                const updated = await updateRes.json();
+                log(`   ✅ Title geändert: "${updated.title}"`, 'success');
+
+                // DELETE
+                log('\n4️⃣ DELETE - Post löschen', 'step');
+                const deleteRes = await fetch(`${API_BASE}/posts/${created.id}`, {
+                    method: 'DELETE'
+                });
+                log(`   ✅ Post gelöscht (Status: ${deleteRes.status})`, 'success');
+
+                log('\n✅ CRUD-Zyklus abgeschlossen!', 'info');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'normal');
+            }
+        }
+
+        // Auto-Load
+        window.onload = () => {
+            clearOutput();
+            log('🌐 Part 5 - HTTP Methods bereit!\n', 'normal');
+            log('Merksätze:', 'normal');
+            log('✅ GET = Daten abrufen (kein body)', 'normal');
+            log('✅ POST = Neue Daten erstellen (mit body)', 'normal');
+            log('✅ PUT = Alles ersetzen (mit body)', 'normal');
+            log('✅ PATCH = Teilweise ändern (mit body)', 'normal');
+            log('✅ DELETE = Löschen (kein body)', 'normal');
+            log('\nKlick auf einen Button oben um zu starten!', 'normal');
+        };
+    </script>
+</body>
+</html>

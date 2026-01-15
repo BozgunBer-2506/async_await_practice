@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 4 - JSON</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #4facfe;
+            padding-bottom: 15px;
+        }
+
+        .exercise {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #4facfe;
+            border-radius: 5px;
+        }
+
+        .exercise h2 {
+            color: #4facfe;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #3a9edb;
+        }
+
+        #output {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            line-height: 1.5;
+        }
+
+        .step {
+            padding: 8px 12px;
+            background: #e7f3ff;
+            border-left: 3px solid #4facfe;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .step.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .step.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .info {
+            background: #d1ecf1;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            color: #0c5460;
+            font-size: 14px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .comparison > div {
+            padding: 15px;
+            border-radius: 5px;
+            background: #f5f5f5;
+            border-left: 3px solid #4facfe;
+        }
+
+        .comparison h4 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .comparison code {
+            display: block;
+            background: white;
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 5px;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .json-structure {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #4facfe;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Part 4 - JSON: JavaScript Object Notation</h1>
+
+        <div class="warning">
+            <strong>💡 JSON ist DAS Standard-Format für Daten im Web!</strong><br>
+            Alle APIs (auch deine FastAPI!) geben JSON zurück.
+        </div>
+
+        <div class="exercise">
+            <h2>1️⃣ JSON Format verstehen</h2>
+            <div class="json-structure">
+{
+  "name": "Max Mustermann",
+  "age": 28,
+  "isStudent": false,
+  "courses": ["React", "Python", "JavaScript"],
+  "address": {
+    "city": "Berlin",
+    "zip": "10115"
+  }
+}
+            </div>
+            <div class="info">
+                ✅ Schlüssel MÜSSEN in "Quotes" sein<br>
+                ✅ Erlaubte Typen: String, Number, Boolean, null, Array, Object<br>
+                ❌ Keine trailing commas!
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>2️⃣ JSON.parse() - String → Object</h2>
+            <button class="btn" onclick="demo1()">JSON parsen</button>
+            <div class="info">
+                JSON String zu JavaScript-Objekt umwandeln
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>3️⃣ JSON.stringify() - Object → String</h2>
+            <button class="btn" onclick="demo2()">Object zu JSON</button>
+            <button class="btn" onclick="demo2Pretty()">Schön formatiert</button>
+            <div class="info">
+                JavaScript-Objekt zu JSON String umwandeln
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>4️⃣ Fehlerhafte JSON erkennen</h2>
+            <button class="btn" onclick="demo3Invalid()">Ungültiges JSON</button>
+            <div class="info">
+                Was passiert wenn JSON nicht korrekt ist?
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>5️⃣ JSON mit Fetch (API-Daten)</h2>
+            <button class="btn" onclick="demo4()">API Daten parsen</button>
+            <div class="info">
+                So funktioniert's in echten APIs
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>📊 JSON vs JavaScript Object</h2>
+            <div class="comparison">
+                <div>
+                    <h4>JSON (Text)</h4>
+                    <code>
+"name": "Max",
+"age": 28,
+"email": "max@mail.de"
+                    </code>
+                    <p style="margin-top: 10px; color: #666; font-size: 12px;">
+                        📄 Nur Text (String)<br>
+                        ✅ Für APIs<br>
+                        ✅ Für Speicherung
+                    </p>
+                </div>
+                <div>
+                    <h4>JavaScript Object</h4>
+                    <code>
+{
+  name: "Max",
+  age: 28,
+  email: "max@mail.de"
+}
+                    </code>
+                    <p style="margin-top: 10px; color: #666; font-size: 12px;">
+                        🔧 Lebendiges Objekt<br>
+                        ✅ Zum Programmieren<br>
+                        ✅ Mit Methoden
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <h2 style="margin-top: 40px; margin-bottom: 20px;">📋 Ausgabe:</h2>
+        <div id="output">Klick auf einen Button um zu starten...</div>
+    </div>
+
+    <script>
+        function log(message, type = 'normal') {
+            const output = document.querySelector('#output');
+            const line = document.createElement('div');
+            
+            if (type === 'step') {
+                line.className = 'step';
+            } else if (type === 'success') {
+                line.className = 'step success';
+            } else if (type === 'error') {
+                line.className = 'step error';
+            }
+            
+            line.textContent = message;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.querySelector('#output').innerHTML = '';
+        }
+
+        // ========================================
+        // DEMO 1: JSON.parse() - String zu Object
+        // ========================================
+        function demo1() {
+            clearOutput();
+            log('1️⃣ JSON.parse() - String → Object\n', 'normal');
+
+            const jsonString = '{"name": "Max", "age": 28, "city": "Berlin"}';
+
+            log('Input (JSON String):', 'step');
+            log(`  ${jsonString}`, 'normal');
+
+            try {
+                // Parse JSON String zu Object
+                const obj = JSON.parse(jsonString);
+
+                log('\nOutput (JavaScript Object):', 'success');
+                log(`  obj.name = "${obj.name}"`, 'normal');
+                log(`  obj.age = ${obj.age}`, 'normal');
+                log(`  obj.city = "${obj.city}"`, 'normal');
+
+                log('\n💡 Jetzt können wir mit .name, .age, etc. arbeiten!', 'normal');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'error');
+            }
+        }
+
+        // ========================================
+        // DEMO 2: JSON.stringify() - Object zu String
+        // ========================================
+        function demo2() {
+            clearOutput();
+            log('2️⃣ JSON.stringify() - Object → String\n', 'normal');
+
+            const user = {
+                name: "Anna",
+                age: 25,
+                hobbies: ["Programmieren", "Lesen"],
+                address: {
+                    city: "München",
+                    zip: "80000"
+                }
+            };
+
+            log('Input (JavaScript Object):', 'step');
+            log(`  user.name = "${user.name}"`, 'normal');
+            log(`  user.age = ${user.age}`, 'normal');
+
+            // Stringify
+            const jsonString = JSON.stringify(user);
+
+            log('\nOutput (JSON String - kompakt):', 'success');
+            log(`  ${jsonString}`, 'normal');
+
+            log('\n💡 Das ist perfekt zum Verschicken per HTTP!', 'normal');
+        }
+
+        function demo2Pretty() {
+            clearOutput();
+            log('2️⃣ JSON.stringify() - Schön formatiert\n', 'normal');
+
+            const user = {
+                name: "Anna",
+                age: 25,
+                hobbies: ["Programmieren", "Lesen"],
+                address: {
+                    city: "München",
+                    zip: "80000"
+                }
+            };
+
+            // Mit null, 2 = 2 Spaces Einrückung
+            const prettyJson = JSON.stringify(user, null, 2);
+
+            log('JSON.stringify(user, null, 2):', 'step');
+            log(prettyJson, 'normal');
+
+            log('\n💡 Perfekt zum Debuggen!', 'normal');
+        }
+
+        // ========================================
+        // DEMO 3: Ungültiges JSON
+        // ========================================
+        function demo3Invalid() {
+            clearOutput();
+            log('3️⃣ Ungültiges JSON - Fehler\n', 'normal');
+
+            const examples = [
+                { json: '{name: "Max"}', error: 'Keine Quotes um "name"' },
+                { json: "{'name': 'Max'}", error: 'Single Quotes statt Double Quotes' },
+                { json: '{"name": "Max",}', error: 'Trailing Comma!' },
+                { json: '{"name": undefined}', error: 'undefined ist nicht erlaubt' }
+            ];
+
+            examples.forEach((ex, i) => {
+                log(`Test ${i + 1}: ${ex.json}`, 'step');
+                try {
+                    JSON.parse(ex.json);
+                    log('✅ Gültig', 'success');
+                } catch (error) {
+                    log(`❌ FEHLER: ${ex.error}`, 'error');
+                    log(`   ${error.message}`, 'normal');
+                }
+                log('', 'normal');
+            });
+        }
+
+        // ========================================
+        // DEMO 4: JSON mit API
+        // ========================================
+        async function demo4() {
+            clearOutput();
+            log('4️⃣ JSON mit Fetch (echte API-Daten)\n', 'normal');
+
+            try {
+                log('⏳ Fetch API-Daten...', 'step');
+                const response = await fetch('https://jsonplaceholder.typicode.com/users/1');
+
+                log('✅ Response erhalten!', 'success');
+                log(`   Status: ${response.status}`, 'normal');
+                log(`   Content-Type: ${response.headers.get('content-type')}`, 'normal');
+
+                // response.json() = JSON parsen
+                log('\n⏳ response.json() aufrufen...', 'step');
+                const user = await response.json();
+
+                log('✅ JSON geparst!', 'success');
+                log(`   Name: ${user.name}`, 'normal');
+                log(`   Email: ${user.email}`, 'normal');
+                log(`   Stadt: ${user.address.city}`, 'normal');
+
+                log('\n💡 response.json() macht intern JSON.parse()!', 'normal');
+
+                // Zeige rohen JSON
+                log('\nRoher JSON (schön formatiert):', 'normal');
+                log(JSON.stringify(user, null, 2), 'normal');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-Load
+        window.onload = () => {
+            clearOutput();
+            log('📋 Part 4 - JSON bereit!\n', 'normal');
+            log('Wichtige Konzepte:', 'normal');
+            log('✅ JSON.parse(string) = String → Object', 'normal');
+            log('✅ JSON.stringify(object) = Object → String', 'normal');
+            log('✅ response.json() macht parse() intern', 'normal');
+            log('✅ JSON ist das Standard-Format für Web-APIs', 'normal');
+            log('\nKlick auf einen Button oben um zu starten!', 'normal');
+        };
+    </script>
+</body>
+</html>

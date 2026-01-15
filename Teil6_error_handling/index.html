@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 6 - Error Handling</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #fa709a;
+            padding-bottom: 15px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .exercise {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #fa709a;
+            border-radius: 5px;
+        }
+
+        .exercise h2 {
+            color: #fa709a;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #fa709a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #f85a7b;
+        }
+
+        #output {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        .step {
+            padding: 8px 12px;
+            background: #e7f3ff;
+            border-left: 3px solid #fa709a;
+            margin: 5px 0;
+            border-radius: 3px;
+        }
+
+        .step.success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .step.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .step.warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .info {
+            background: #fce4ec;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            color: #880e4f;
+            font-size: 14px;
+            border-left: 4px solid #fa709a;
+        }
+
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            border-left: 3px solid #fa709a;
+        }
+
+        code {
+            background: transparent;
+            padding: 0;
+            color: #333;
+        }
+
+        .error-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .error-type {
+            padding: 15px;
+            border-radius: 5px;
+            background: #f5f5f5;
+            border-left: 3px solid #dc3545;
+        }
+
+        .error-type h4 {
+            color: #dc3545;
+            margin-bottom: 8px;
+        }
+
+        .error-type p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Part 6 - Error Handling richtig machen</h1>
+
+        <div class="warning-box">
+            <strong>⚠️ WICHTIG: fetch() wirft NICHT bei 404/500!</strong><br>
+            <br>
+            fetch() wirft nur Error bei NETZWERK-Fehler (kein Internet, Server nicht erreichbar).<br>
+            HTTP-Fehler (404, 500, etc.) sind kein Error - du musst selbst <code>response.ok</code> prüfen!
+        </div>
+
+        <div class="exercise">
+            <h2>1️⃣ Das Problem: fetch() versteckt Fehler</h2>
+            <button class="btn" onclick="demo1Bad()">❌ FALSCH: Ohne response.ok Prüfung</button>
+            <button class="btn" onclick="demo1Good()">✅ RICHTIG: Mit response.ok Prüfung</button>
+            <div class="info">
+                Vergleiche: Was passiert mit und ohne Prüfung?
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>2️⃣ HTTP-Fehler Codes unterscheiden</h2>
+            <button class="btn" onclick="demo2()">Verschiedene Status-Codes</button>
+            <div class="info">
+                404 vs 500 vs 403 - Jeder bedeutet etwas anderes!
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>3️⃣ Netzwerk-Fehler vs HTTP-Fehler</h2>
+            <button class="btn" onclick="demo3Network()">Netzwerk-Fehler simulieren</button>
+            <button class="btn" onclick="demo3HTTP()">HTTP-Fehler</button>
+            <div class="info">
+                Unterschied zwischen Netzwerk-Fehler (kein Internet) und HTTP-Fehler (404)
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>4️⃣ Robuste Fetch-Funktion</h2>
+            <button class="btn" onclick="demo4Success()">Erfolgreicher Request</button>
+            <button class="btn" onclick="demo4Error()">Mit Fehler</button>
+            <div class="info">
+                Eine reusable Funktion für sicheres Fetching
+            </div>
+        </div>
+
+        <div class="exercise">
+            <h2>📋 HTTP Status-Codes</h2>
+            <div class="error-types">
+                <div class="error-type">
+                    <h4>2xx - Success ✅</h4>
+                    <p>200 OK<br>201 Created<br>204 No Content</p>
+                </div>
+                <div class="error-type">
+                    <h4>3xx - Redirect ➡️</h4>
+                    <p>301 Moved<br>302 Found<br>304 Not Modified</p>
+                </div>
+                <div class="error-type">
+                    <h4>4xx - Client Error ❌</h4>
+                    <p>400 Bad Request<br>401 Unauthorized<br>403 Forbidden<br>404 Not Found</p>
+                </div>
+                <div class="error-type">
+                    <h4>5xx - Server Error 🔥</h4>
+                    <p>500 Internal Error<br>502 Bad Gateway<br>503 Service Unavailable</p>
+                </div>
+            </div>
+        </div>
+
+        <h2 style="margin-top: 40px; margin-bottom: 20px;">📋 Ausgabe:</h2>
+        <div id="output">Klick auf einen Button um zu starten...</div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://jsonplaceholder.typicode.com';
+
+        function log(message, type = 'normal') {
+            const output = document.querySelector('#output');
+            const line = document.createElement('div');
+            
+            if (type === 'step') {
+                line.className = 'step';
+            } else if (type === 'success') {
+                line.className = 'step success';
+            } else if (type === 'error') {
+                line.className = 'step error';
+            } else if (type === 'warning') {
+                line.className = 'step warning';
+            }
+            
+            line.textContent = message;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.querySelector('#output').innerHTML = '';
+        }
+
+        // ========================================
+        // DEMO 1: Das Problem
+        // ========================================
+        async function demo1Bad() {
+            clearOutput();
+            log('❌ FALSCH: Ohne response.ok Prüfung\n', 'normal');
+
+            try {
+                log('⏳ Lade User 99999 (existiert nicht)...', 'step');
+                
+                const response = await fetch(`${API_BASE}/users/99999`);
+                
+                // FEHLER: Wir prüfen NICHT auf response.ok!
+                const user = await response.json();
+                
+                log('✅ User geladen!', 'success');
+                log(`   Name: ${user.name}`, 'normal');
+
+            } catch (error) {
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function demo1Good() {
+            clearOutput();
+            log('✅ RICHTIG: Mit response.ok Prüfung\n', 'normal');
+
+            try {
+                log('⏳ Lade User 99999 (existiert nicht)...', 'step');
+                
+                const response = await fetch(`${API_BASE}/users/99999`);
+                
+                // RICHTIG: Prüfe response.ok
+                log(`   Status: ${response.status}`, 'normal');
+                log(`   OK?: ${response.ok}`, 'normal');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status} - User nicht gefunden`);
+                }
+
+                const user = await response.json();
+                log('✅ User geladen!', 'success');
+
+            } catch (error) {
+                log(`❌ Fehler GEFANGEN:`, 'error');
+                log(`   ${error.message}`, 'normal');
+                log('\n💡 So können wir Fehler richtig behandeln!', 'warning');
+            }
+        }
+
+        // ========================================
+        // DEMO 2: HTTP-Codes unterscheiden
+        // ========================================
+        async function demo2() {
+            clearOutput();
+            log('📊 Demo: Verschiedene HTTP-Status-Codes\n', 'normal');
+
+            // Test 1: 200 OK
+            log('Test 1: Existierender User (200 OK)', 'step');
+            const res1 = await fetch(`${API_BASE}/users/1`);
+            log(`   Status: ${res1.status} ${res1.statusText}`, 'success');
+            
+            // Test 2: 404 Not Found
+            log('\nTest 2: Nicht existierender User (404)', 'step');
+            const res2 = await fetch(`${API_BASE}/users/99999`);
+            log(`   Status: ${res2.status} ${res2.statusText}`, 'error');
+
+            // Test 3: Ungültige Ressource
+            log('\nTest 3: Ungültige URL (/invalid)', 'step');
+            const res3 = await fetch(`${API_BASE}/invalid`);
+            log(`   Status: ${res3.status} ${res3.statusText}`, 'error');
+
+            log('\n💡 Merke: response.ok ist true bei 200-299, false sonst!', 'warning');
+        }
+
+        // ========================================
+        // DEMO 3: Fehler unterscheiden
+        // ========================================
+        async function demo3Network() {
+            clearOutput();
+            log('🌐 Netzwerk-Fehler simulieren\n', 'normal');
+
+            try {
+                log('⏳ Versuche ungültige Domain zu erreichen...', 'step');
+                
+                // Das wirft ein TypeError wegen CORS/Network
+                const response = await fetch('https://invalid-domain-12345-xyz.com/api');
+                const user = await response.json();
+
+            } catch (error) {
+                log(`❌ NETZWERK-FEHLER GEFANGEN!`, 'error');
+                log(`   Error Type: ${error.constructor.name}`, 'normal');
+                log(`   Message: ${error.message}`, 'normal');
+                log('\n💡 Das ist ein TypeError - Netzwerk-Problem!', 'warning');
+            }
+        }
+
+        async function demo3HTTP() {
+            clearOutput();
+            log('📡 HTTP-Fehler (404)\n', 'normal');
+
+            try {
+                log('⏳ Lade nicht existierende User...', 'step');
+                
+                const response = await fetch(`${API_BASE}/users/99999`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status} - Ressource nicht gefunden`);
+                }
+
+                const user = await response.json();
+
+            } catch (error) {
+                log(`❌ HTTP-FEHLER GEFANGEN!`, 'error');
+                log(`   Error Type: ${error.constructor.name}`, 'normal');
+                log(`   Message: ${error.message}`, 'normal');
+                log('\n💡 Das ist unser Error - HTTP-Problem!', 'warning');
+            }
+        }
+
+        // ========================================
+        // DEMO 4: Robuste Funktion
+        // ========================================
+        async function safeFetch(url) {
+            const response = await fetch(url);
+
+            // HTTP-Status prüfen
+            if (!response.ok) {
+                // Verschiedene Status-Codes unterscheiden
+                if (response.status === 404) {
+                    throw new Error('Ressource nicht gefunden (404)');
+                } else if (response.status === 401) {
+                    throw new Error('Nicht autorisiert - bitte einloggen (401)');
+                } else if (response.status === 403) {
+                    throw new Error('Zugriff verweigert (403)');
+                } else if (response.status >= 500) {
+                    throw new Error('Server-Fehler - bitte später versuchen');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            }
+
+            return response.json();
+        }
+
+        async function demo4Success() {
+            clearOutput();
+            log('✅ Demo 4a: Erfolgreicher Request\n', 'normal');
+
+            try {
+                log('⏳ Lade User mit safeFetch()...', 'step');
+                const user = await safeFetch(`${API_BASE}/users/1`);
+                
+                log('✅ Erfolgreich!', 'success');
+                log(`   Name: ${user.name}`, 'normal');
+                log(`   Email: ${user.email}`, 'normal');
+
+            } catch (error) {
+                log(`❌ Fehler: ${error.message}`, 'error');
+            }
+        }
+
+        async function demo4Error() {
+            clearOutput();
+            log('❌ Demo 4b: Mit Fehler\n', 'normal');
+
+            try {
+                log('⏳ Lade User 99999 mit safeFetch()...', 'step');
+                const user = await safeFetch(`${API_BASE}/users/99999`);
+                
+                log('✅ Erfolgreich!', 'success');
+
+            } catch (error) {
+                log(`❌ safeFetch() gefangen:`, 'error');
+                log(`   ${error.message}`, 'normal');
+                log('\n💡 safeFetch() wirft bei HTTP-Fehler!', 'warning');
+                log('Damit können wir Fehler richtig behandeln.', 'normal');
+            }
+        }
+
+        // Auto-Load
+        window.onload = () => {
+            clearOutput();
+            log('🛡️ Part 6 - Error Handling bereit!\n', 'normal');
+            log('Wichtige Punkte:', 'normal');
+            log('✅ fetch() wirft NUR bei Netzwerk-Fehler', 'normal');
+            log('✅ HTTP-Fehler musst du mit response.ok prüfen', 'normal');
+            log('✅ Immer try/catch verwenden', 'normal');
+            log('✅ Verschiedene Status-Codes unterscheiden', 'normal');
+            log('\nKlick auf einen Button oben um zu starten!', 'normal');
+        };
+    </script>
+</body>
+</html>
