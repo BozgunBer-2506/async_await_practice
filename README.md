@@ -67,6 +67,21 @@ Part 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11
 - [JSONPlaceholder](https://jsonplaceholder.typicode.com) - Fake REST API
 - [wttr.in](https://wttr.in) - Weather API
 
+## 📝 Language Note
+
+**Content Language:** German (Deutsch) 🇩🇪
+- All exercise explanations and tutorials are in **German**
+- User interface text is in **German**
+- Comments in code are in **German**
+
+**Code Language:** English (English)
+- All variable names, function names, and code comments follow English conventions
+- This makes the code universally readable and professional
+
+**Why?** This project is part of a German educational program while maintaining international code standards.
+
+---
+
 ## 📝 License
 
 MIT License - Free to use and modify!
