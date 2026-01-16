@@ -72,13 +72,14 @@ Part 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11
 **Content Language:** German (Deutsch) 🇩🇪
 - All exercise explanations and tutorials are in **German**
 - User interface text is in **German**
-- Comments in code are in **German**
+- Code comments are in **German**
+- Section headers and documentation are in **German**
 
-**Code Language:** English (English)
-- All variable names, function names, and code comments follow English conventions
-- This makes the code universally readable and professional
+**Code Language:** English
+- All variable names and function names follow English conventions
+- This maintains international coding standards while keeping explanations in German
 
-**Why?** This project is part of a German educational program while maintaining international code standards.
+**Why?** This project is part of a German educational program with German learning focus.
 
 ---
 
